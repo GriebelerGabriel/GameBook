@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	template="/templates/modelo.xhtml">
+	
+	<ui:define name="menu">
+		<ui:include src="/includes/menu.xhtml" />
+	</ui:define>
+	
+	<ui:define name="conteudo">		
+		<h:form id="frmUsuarioListagem">
+			<p:dataTable id="tblUsuarios"
+						 emptyMessage="Nenhum registro encontrado."
+						 value="#{MBusuario.itens}" 
+						 var="itemUsuario"
+						 paginator="true" 
+						 rows="10">
+			
+			<f:facet name="header">
+				Usuários - Listagem				
+			</f:facet>
+			
+			<p:column headerText="ID Usuário: " sortBy="#{itemUsuario.usuarioID}">
+				<h:outputText value="#{itemUsuario.usuarioID}"/>
+			</p:column>
+			
+			<p:column headerText="Nome Usuário: " sortBy="#{itemUsuario.usuarioNome}" >
+				<h:outputText value="#{itemUsuario.usuarioNome}"/>
+			</p:column>
+			
+			<p:column headerText="Data de nascimento do Usuário: " sortBy="#{itemUsuario.usuarioDataNascimento}">
+				<h:outputText value="#{itemUsuario.usuarioDataNascimento}"/>
+			</p:column>
+			
+			<p:column headerText="Usuário Admin? " sortBy="#{itemUsuario.usuarioAdmin}">
+				<h:outputText value="#{itemUsuario.usuarioAdmin}"/>
+			</p:column>
+			
+			<p:column headerText="E-mail do Usuário: " sortBy="#{itemUsuario.usuarioEmail}">
+				<h:outputText value="#{itemUsuario.usuarioEmail}"/>
+			</p:column>
+			
+				<p:column headerText="Opções">
+					<p:commandButton value="Excluir" icon="ui-icon-trash"
+						oncomplete="PF('dlgUsuarioExcluir').show();"
+						update=":frmUsuarioExcluir:pnlUsuarioExcluir" immediate="true"
+						action="#{MBusuario.setUsuario(itemUsuario)}" />
+						&nbsp;&nbsp;	
+					<p:commandButton value="Editar" icon="ui-icon-pencil"
+						oncomplete="PF('dlgUsuarioEditar').show();"
+						update=":frmUsuarioEditar:pnlUsuarioEditar" immediate="true"
+						action="#{MBusuario.setUsuario(itemUsuario)}" />
+				</p:column>
+			
+			<f:facet name="footer">
+				<p:commandButton value="Novo"
+								 actionListener="#{MBusuario.prepararNovo}"
+								 oncomplete="PF('dlgUsuarioNovo').show();"
+								 update=":frmUsuarioNovo:pnlUsuarioNovo" />				
+			</f:facet>
+			
+			</p:dataTable>
+		</h:form>
+		
+		<p:dialog widgetVar="dlgUsuarioNovo" closable="false"
+				  draggable="false" resizable="false"
+				  modal="true" appendTo="@(body)" 
+				  header="Usuario - Novo" >
+				  <h:form id="frmUsuarioNovo">
+				  		<h:panelGrid id="pnlUsuarioNovo" columns="2">
+				  			<p:outputLabel value="Nome: " />
+				  			<p:inputText value="#{MBusuario.usuario.usuarioNome}" size="60"/>
+				  			
+				  			<p:outputLabel value="Data de Nascimento: "/>
+				  			<p:inputText value="#{MBusuario.usuario.usuarioDataNascimento}" size="60"/>
+				  			
+				  			
+				  			<p:outputLabel value="E-mail do Usuário: " />
+				  			<p:inputText value="#{MBusuario.usuario.usuarioEmail}" size="60"/>
+				  			
+				  			<p:outputLabel value="Senha do Usuário: " />
+				  			<p:inputText value="#{MBusuario.usuario.usuarioSenha}" size="60"/>
+				  			
+				  			<p:outputLabel value="Usuário Administrador? (Sim ou Não): " />
+				  			<p:inputText value="#{MBusuario.usuario.usuarioAdmin}" size="60"/>		
+				  							  			
+				  		</h:panelGrid>
+				  		
+				  		<h:panelGrid columns="2">
+				  			<p:commandButton value="Salvar" 
+				  							 actionListener="#{MBusuario.novo}"
+				  							 oncomplete="PF('dlgUsuarioNovo').hide();" 
+				  							 update=":frmUsuarioListagem:tblUsuarios :msgGlobal"/>
+				  			<p:commandButton value="Cancelar" onclick="PF('dlgUsuarioNovo').hide();" />
+				  		</h:panelGrid>
+				  </h:form>
+		</p:dialog>
+				<p:dialog widgetVar="dlgUsuarioEditar" closable="false"
+			draggable="false" resizable="false" modal="true" appendTo="@(body)"
+			header="usuario - Editar">
+			<h:form id="frmUsuarioEditar">
+				<h:panelGrid id="pnlUsuarioEditar" columns="2">
+				
+							<p:outputLabel value="Nome: " />
+				  			<p:inputText value="#{MBusuario.usuario.usuarioNome}" size="60"/>
+				  			
+				  			<p:outputLabel value="Data de Nascimento: "/>
+				  			<p:inputText value="#{MBusuario.usuario.usuarioDataNascimento}" size="60"/>
+				  			
+				  			
+				  			<p:outputLabel value="E-mail do Usuário: " />
+				  			<p:inputText value="#{MBusuario.usuario.usuarioEmail}" size="60"/>
+				  			
+				  			<p:outputLabel value="Senha do Usuário: " />
+				  			<p:inputText value="#{MBusuario.usuario.usuarioSenha}" size="60"/>
+				  			
+				  			<p:outputLabel value="Usuário Administrador? (Sim ou Não): " />
+				  			<p:inputText value="#{MBusuario.usuario.usuarioAdmin}" size="60"/>
+
+				</h:panelGrid>
+
+				<h:panelGrid columns="2">
+					<p:commandButton value="Gravar" actionListener="#{MBusuario.editar}"
+						oncomplete="PF('dlgUsuarioEditar').hide();"
+						update=":frmUsuarioListagem:tblUsuarios :msgGlobal" />
+					<p:commandButton value="Cancelar"
+						onclick="PF('dlgUsuarioEditar').hide();" />
+				</h:panelGrid>
+			</h:form>
+		</p:dialog>
+
+
+		<p:dialog widgetVar="dlgUsuarioExcluir" closable="true"
+			draggable="false" resizable="false" header="Usuario - Excluir">
+			<h:form id="frmUsuarioExcluir">
+				<h:panelGrid id="pnlUsuarioExcluir" columns="2">
+							
+							<p:outputLabel value="Usuario ID: " />
+				  			<p:inputText value="#{MBusuario.usuario.usuarioID}" size="60"/>
+							
+							<p:outputLabel value="Nome: " />
+				  			<p:inputText value="#{MBusuario.usuario.usuarioNome}" size="60"/>
+				  			
+				  			<p:outputLabel value="Data de Nascimento: "/>
+				  			<p:inputText value="#{MBusuario.usuario.usuarioDataNascimento}" size="60"/>
+				  			
+				  			
+				  			<p:outputLabel value="E-mail do Usuário: " />
+				  			<p:inputText value="#{MBusuario.usuario.usuarioEmail}" size="60"/>
+				  			
+				  			<p:outputLabel value="Senha do Usuário: " />
+				  			<p:inputText value="#{MBusuario.usuario.usuarioSenha}" size="60"/>
+				  			
+				  			<p:outputLabel value="Usuário Administrador? (Sim ou Não): " />
+				  			<p:inputText value="#{MBusuario.usuario.usuarioAdmin}" size="60"/>
+
+				</h:panelGrid>
+
+				<h:panelGrid columns="2">
+					<p:commandButton value="Excluir"
+						actionListener="#{MBusuario.excluir}"
+						update=":msgGlobal :frmUsuarioListagem:tblUsuarios"
+						oncomplete="PF('dlgUsuarioExcluir').hide();" />
+					<p:commandButton value="Cancelar"
+						oncomplete="PF('dlgUsuarioExcluir').hide();" />
+				</h:panelGrid>
+			</h:form>
+		</p:dialog>
+	</ui:define>
+	
+</ui:composition>

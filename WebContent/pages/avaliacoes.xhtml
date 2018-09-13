@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	template="/templates/modelo.xhtml">
+	
+	<ui:define name="menu">
+		<ui:include src="/includes/menu.xhtml" />
+	</ui:define>
+	
+	<ui:define name="conteudo">		
+		<h:form id="frmAvaliacaoListagem">
+			<p:dataTable id="tblAvaliacao"
+						 emptyMessage="Nenhum registro encontrado."
+						 value="#{MBavaliacao.itens}" 
+						 var="itemAvaliacao"
+						 paginator="true" 
+						 rows="10">
+			
+			<f:facet name="header">
+				Avaliações - Listagem				
+			</f:facet>
+			
+			<p:column headerText="ID Avaliação: " sortBy="#{itemAvaliacao.avaliacaoID}">
+				<h:outputText value="#{itemAvaliacao.avaliacaoID}"/>
+			</p:column>
+			
+			<p:column headerText="Avaliação Comentário: " sortBy="#{itemAvaliacao.avaliacaoComentario}" >
+				<h:outputText value="#{itemAvaliacao.avaliacaoComentario}"/>
+			</p:column>
+			
+			<p:column headerText="Avaliação em Estrelas: " sortBy="#{itemAvaliacao.avaliacao}">
+				<h:outputText value="#{itemAvaliacao.avaliacao}"/>
+			</p:column>
+			
+			<p:column headerText="Jogo ID: " sortBy="#{itemAvaliacao.jogo.jogoID}">
+				<h:outputText value="#{itemAvaliacao.jogo.jogoID}"/>
+			</p:column>
+			
+			<p:column headerText="Opções">
+					<p:commandButton value="Excluir" icon="ui-icon-trash"
+						oncomplete="PF('dlgAvaliacaoExcluir').show();"
+						update=":frmAvaliacaoExcluir:pnlAvaliacaoExcluir" immediate="true"
+						action="#{MBavaliacao.setAvaliacao(itemAvaliacao)}" />
+						&nbsp;&nbsp;	
+					<p:commandButton value="Editar" icon="ui-icon-pencil"
+						oncomplete="PF('dlgAvaliacaoEditar').show();"
+						update=":frmAvaliacaoEditar:pnlAvaliacaoEditar" immediate="true"
+						action="#{MBavaliacao.setAvaliacao(itemAvaliacao)}" />
+				</p:column>
+			
+			<f:facet name="footer">
+				<p:commandButton value="Nova Avaliação"
+								 actionListener="#{MBavaliacao.prepararNovo}"
+								 oncomplete="PF('dlgAvaliacaoNovo').show();"
+								 update=":frmAvaliacaoNovo:pnlAvaliacaoNovo" />				
+			</f:facet>
+			
+			</p:dataTable>
+		</h:form>
+		
+		<p:dialog widgetVar="dlgAvaliacaoNovo" closable="false"
+				  draggable="false" resizable="false"
+				  modal="true" appendTo="@(body)" 
+				  header="Avaliação - Nova" >
+				  <h:form id="frmAvaliacaoNovo">
+				  		<h:panelGrid id="pnlAvaliacaoNovo" columns="2">
+				  		
+				  			<p:outputLabel value="Jogo: " />
+							<p:selectOneMenu value="#{MBavaliacao.avaliacao.jogo.jogoID}">
+								<f:selectItem itemLabel="Selecione" />
+								<f:selectItems value="#{MBGame.allJogos}" />
+							</p:selectOneMenu>
+				  			
+				  			<p:outputLabel value="Comentario da Avaliação: " />
+				  			<p:inputText value="#{MBavaliacao.avaliacao.avaliacaoComentario}" size="100"/>
+				  			
+				  			<p:outputLabel value="Numero de estrelas(0 à 5): "/>
+				  			<p:inputText value="#{MBavaliacao.avaliacao.avaliacao}" size="60"/>
+				  			
+				  			
+			  			
+				  		</h:panelGrid>
+				  		
+				  		<h:panelGrid columns="2">
+				  			<p:commandButton value="Salvar" 
+				  							 actionListener="#{MBavaliacao.novo}"
+				  							 oncomplete="PF('dlgAvaliacaoNovo').hide();" 
+				  							 update=":frmAvaliacaoListagem:tblAvaliacao :msgGlobal"/>
+				  			<p:commandButton value="Cancelar" onclick="PF('dlgAvaliacaoNovo').hide();" />
+				  		</h:panelGrid>
+				  </h:form>
+		</p:dialog>
+		<p:dialog widgetVar="dlgAvaliacaoEditar" closable="false"
+			draggable="false" resizable="false" modal="true" appendTo="@(body)"
+			header="Avaliacao - Editar">
+			<h:form id="frmAvaliacaoEditar">
+				<h:panelGrid id="pnlAvaliacaoEditar" columns="2">
+				
+					<p:outputLabel value="Jogo: " />
+							<p:selectOneMenu value="#{MBavaliacao.avaliacao.jogo.jogoID}">
+								<f:selectItem itemLabel="Selecione" />
+								<f:selectItems value="#{MBjogo.allJogos}" />
+							</p:selectOneMenu>
+				  			
+				  			<p:outputLabel value="Comentario da Avaliação: " />
+				  			<p:inputText value="#{MBavaliacao.avaliacao.avaliacaoComentario}" size="100"/>
+				  			
+				  			<p:outputLabel value="Numero de estrelas(0 à 5): "/>
+				  			<p:inputText value="#{MBavaliacao.avaliacao.avaliacao}" size="60"/>
+
+				</h:panelGrid>
+
+				<h:panelGrid columns="2">
+					<p:commandButton value="Gravar" actionListener="#{MBavaliacao.editar}"
+						oncomplete="PF('dlgAvaliacaoEditar').hide();"
+						update=":frmAvaliacaoListagem:tblAvaliacao :msgGlobal" />
+					<p:commandButton value="Cancelar"
+						onclick="PF('dlgAvaliacaoEditar').hide();" />
+				</h:panelGrid>
+			</h:form>
+		</p:dialog>
+
+
+		<p:dialog widgetVar="dlgAvaliacaoExcluir" closable="true"
+			draggable="false" resizable="false" header="Avaliacao - Excluir">
+			<h:form id="frmAvaliacaoExcluir">
+				<h:panelGrid id="pnlAvaliacaoExcluir" columns="2">
+				
+							<p:outputLabel value="Avaliação ID: " />
+				  			<p:inputText value="#{MBavaliacao.avaliacao.avaliacaoID}" size="100"/>
+							
+				  			<p:outputLabel value="Comentario da Avaliação: " />
+				  			<p:inputText value="#{MBavaliacao.avaliacao.avaliacaoComentario}" size="100"/>
+				  			
+				  			<p:outputLabel value="Numero de estrelas(0 à 5): "/>
+				  			<p:inputText value="#{MBavaliacao.avaliacao.avaliacao}" size="60"/>
+				  			
+				  			<p:outputLabel value="Jogo ID: "/>
+				  			<p:inputText value="#{MBavaliacao.avaliacao.jogo.jogoID}" size="60"/>
+				  					  			
+
+				</h:panelGrid>
+
+				<h:panelGrid columns="2">
+					<p:commandButton value="Excluir"
+						actionListener="#{MBavaliacao.excluir}"
+						update=":msgGlobal :frmAvaliacaoListagem:tblAvaliacao"
+						oncomplete="PF('dlgAvaliacaoExcluir').hide();" />
+					<p:commandButton value="Cancelar"
+						oncomplete="PF('dlgAvaliacaoExcluir').hide();" />
+				</h:panelGrid>
+			</h:form>
+		</p:dialog>
+	</ui:define>
+	
+</ui:composition>

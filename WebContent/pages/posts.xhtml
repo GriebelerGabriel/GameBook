@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	template="/templates/modelo.xhtml">
+	
+	<ui:define name="menu">
+		<ui:include src="/includes/menu.xhtml" />
+	</ui:define>
+	
+	<ui:define name="conteudo">		
+		<h:form id="frmPostListagem">
+			<p:dataTable id="tblPosts"
+						 emptyMessage="Nenhum registro encontrado."
+						 value="#{MBpost.itens}" 
+						 var="itemPost"
+						 paginator="true" 
+						 rows="10">
+			
+			<f:facet name="header">
+				Posts - Listagem				
+			</f:facet>
+			
+			<p:column headerText="ID Post: " sortBy="#{itemPost.postID}">
+				<h:outputText value="#{itemPost.postID}"/>
+			</p:column>
+			
+			<p:column headerText="Legenda: " sortBy="#{itemPost.postLegenda}" >
+				<h:outputText value="#{itemPost.postLegenda}"/>
+			</p:column>
+			
+			<p:column headerText="Usuário: " sortBy="#{itemPost.usuario.usuarioID}">
+				<h:outputText value="#{itemPost.usuario.usuarioID}"/>
+			</p:column>		
+			
+			<p:column headerText="Opções">
+					<p:commandButton value="Excluir" icon="ui-icon-trash"
+						oncomplete="PF('dlgPostExcluir').show();"
+						update=":frmPostExcluir:pnlPostExcluir" immediate="true"
+						action="#{MBpost.setPost(itemPost)}" />
+						&nbsp;&nbsp;	
+					<p:commandButton value="Editar" icon="ui-icon-pencil"
+						oncomplete="PF('dlgPostEditar').show();"
+						update=":frmPostEditar:pnlPostEditar" immediate="true"
+						action="#{MBpost.setPost(itemPost)}" />
+				</p:column>
+			
+			<f:facet name="footer">
+				<p:commandButton value="Novo"
+								 actionListener="#{MBpost.prepararNovo}"
+								 oncomplete="PF('dlgPostNovo').show();"
+								 update=":frmPostNovo:pnlPostNovo" />				
+			</f:facet>
+			
+			</p:dataTable>
+		</h:form>
+		
+		<p:dialog widgetVar="dlgPostNovo" closable="false"
+				  draggable="false" resizable="false"
+				  modal="true" appendTo="@(body)" 
+				  header="Post - Novo" >
+				  <h:form id="frmPostNovo">
+				  		<h:panelGrid id="pnlPostNovo" columns="2">
+				  			<p:outputLabel value="Legenda: " />
+				  			<p:inputText value="#{MBpost.post.postLegenda}" size="60"/>
+				  			
+				  			<p:outputLabel value="Usuário: " />
+							<p:selectOneMenu value="#{MBpost.post.usuario.usuarioID}">
+								<f:selectItem itemLabel="Selecione" />
+								<f:selectItems value="#{MBusuario.allUsuarios}" />
+							</p:selectOneMenu>
+			  			
+				  		</h:panelGrid>
+				  		
+				  		<h:panelGrid columns="2">
+				  			<p:commandButton value="Salvar" 
+				  							 actionListener="#{MBpost.novo}"
+				  							 oncomplete="PF('dlgPostNovo').hide();" 
+				  							 update=":frmPostListagem:tblPosts :msgGlobal"/>
+				  			<p:commandButton value="Cancelar" onclick="PF('dlgPostNovo').hide();" />
+				  		</h:panelGrid>
+				  </h:form>
+		</p:dialog>
+		<p:dialog widgetVar="dlgPostEditar" closable="false"
+			draggable="false" resizable="false" modal="true" appendTo="@(body)"
+			header="post - Editar">
+			<h:form id="frmPostEditar">
+				<h:panelGrid id="pnlPostEditar" columns="2">
+					<p:outputLabel value="Legenda: " />
+					<p:inputText value="#{MBpost.post.postLegenda}" required="true" />
+					
+					<p:outputLabel value="Usuário ID: " />
+					<p:inputText value="#{MBpost.post.usuario.usuarioID}" required="true" />
+
+				</h:panelGrid>
+
+				<h:panelGrid columns="2">
+					<p:commandButton value="Gravar" actionListener="#{MBpost.editar}"
+						oncomplete="PF('dlgPostEditar').hide();"
+						update=":frmPostListagem:tblPosts :msgGlobal" />
+					<p:commandButton value="Cancelar"
+						onclick="PF('dlgPostEditar').hide();" />
+				</h:panelGrid>
+			</h:form>
+		</p:dialog>
+
+
+		<p:dialog widgetVar="dlgPostExcluir" closable="true"
+			draggable="false" resizable="false" header="Post - Excluir">
+			<h:form id="frmPostExcluir">
+				<h:panelGrid id="pnlPostExcluir" columns="2">
+
+					<p:outputLabel value="Legenda: " />
+				  	<p:inputText value="#{MBpost.post.postLegenda}" size="60"/>
+
+					<p:outputLabel value="Usuario ID " />
+				  	<p:inputText value="#{MBpost.post.usuario.usuarioID}" size="60"/>
+
+					<p:outputLabel value="Post ID " />
+				  	<p:inputText value="#{MBpost.post.postID}" size="60"/>
+
+				</h:panelGrid>
+
+				<h:panelGrid columns="2">
+					<p:commandButton value="Excluir"
+						actionListener="#{MBpost.excluir}"
+						update=":msgGlobal :frmPostListagem:tblPosts"
+						oncomplete="PF('dlgPostExcluir').hide();" />
+					<p:commandButton value="Cancelar"
+						oncomplete="PF('dlgPostExcluir').hide();" />
+				</h:panelGrid>
+			</h:form>
+		</p:dialog>
+	</ui:define>
+	
+</ui:composition>

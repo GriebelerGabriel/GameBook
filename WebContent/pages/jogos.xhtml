@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	template="/templates/modelo.xhtml">
+	
+	<ui:define name="menu">
+		<ui:include src="/includes/menu.xhtml" />
+	</ui:define>
+	
+	<ui:define name="conteudo">		
+		<h:form id="frmJogoListagem">
+			<p:dataTable id="tblJogos"
+						 emptyMessage="Nenhum registro encontrado."
+						 value="#{MBGame.itens}" 
+						 var="itemJogo"
+						 paginator="true" 
+						 rows="10">
+			
+			<f:facet name="header">
+				Jogos - Listagem				
+			</f:facet>
+			
+			<p:column headerText="ID Jogo: " sortBy="#{itemJogo.jogoID}">
+				<h:outputText value="#{itemJogo.jogoID}"/>
+			</p:column>
+			
+			<p:column headerText="Nome Jogo: " sortBy="#{itemJogo.jogoNome}" >
+				<h:outputText value="#{itemJogo.jogoNome}"/>
+			</p:column>
+			
+			<p:column headerText="Data de Lançamento do Jogo: " sortBy="#{itemJogo.jogoDataLancamento}">
+				<h:outputText value="#{itemJogo.jogoDataLancamento}"/>
+			</p:column>
+			
+			<p:column headerText="Gênero do Jogo: " sortBy="#{itemJogo.jogoGenero}">
+				<h:outputText value="#{itemJogo.jogoGenero}"/>
+			</p:column>
+			
+			<p:column headerText="Empresa dona do jogo ID : " sortBy="#{itemJogo.empresaID}">
+				<h:outputText value="#{itemJogo.empresa.empresaID}"/>
+			</p:column>
+			
+			<p:column headerText="Opções">
+					<p:commandButton value="Excluir" icon="ui-icon-trash"
+						oncomplete="PF('dlgJogoExcluir').show();"
+						update=":frmJogoExcluir:pnlJogoExcluir" immediate="true"
+						action="#{MBGame.setJogo(itemJogo)}" />
+						&nbsp;&nbsp;	
+					<p:commandButton value="Editar" icon="ui-icon-pencil"
+						oncomplete="PF('dlgJogoEditar').show();"
+						update=":frmJogoEditar:pnlJogoEditar" immediate="true"
+						action="#{MBGame.setJogo(itemJogo)}" />
+				</p:column>
+			
+			<f:facet name="footer">
+				<p:commandButton value="Novo"
+								 actionListener="#{MBGame.prepararNovo}"
+								 oncomplete="PF('dlgJogoNovo').show();"
+								 update=":frmJogoNovo:pnlJogoNovo" />				
+			</f:facet>
+			
+			</p:dataTable>
+		</h:form>
+		
+		<p:dialog widgetVar="dlgJogoNovo" closable="false"
+				  draggable="false" resizable="false"
+				  modal="true" appendTo="@(body)" 
+				  header="Jogo - Novo" >
+				  <h:form id="frmJogoNovo">
+				  		<h:panelGrid id="pnlJogoNovo" columns="2">
+				  			<p:outputLabel value="Nome: " />
+				  			<p:inputText value="#{MBGame.jogo.jogoNome}" size="60"/>
+				  			
+				  			<p:outputLabel value="Data de Lançamento: "/>
+				  			<p:inputText value="#{MBGame.jogo.jogoDataLancamento}" size="60"/>
+				  			
+				  			<p:outputLabel value="Gênero do Jogo: " />
+				  			<p:inputText value="#{MBGame.jogo.jogoGenero}" size="60"/>
+				  			
+							<p:outputLabel value="Empresa: " />
+							<p:selectOneMenu value="#{MBGame.jogo.empresa.empresaID}">
+								<f:selectItem itemLabel="Selecione" />
+								<f:selectItems value="#{MBempresa.allEmpresas}" />
+							</p:selectOneMenu>
+											  			
+				  		</h:panelGrid>
+				  		
+				  		<h:panelGrid columns="2">
+				  			<p:commandButton value="Salvar" 
+				  							 actionListener="#{MBGame.novo}"
+				  							 oncomplete="PF('dlgJogoNovo').hide();" 
+				  							 update=":frmJogoListagem:tblJogos :msgGlobal"/>
+				  			<p:commandButton value="Cancelar" onclick="PF('dlgJogoNovo').hide();" />
+				  		</h:panelGrid>
+				  </h:form>
+		</p:dialog>
+		<p:dialog widgetVar="dlgJogoEditar" closable="false"
+			draggable="false" resizable="false" modal="true" appendTo="@(body)"
+			header="Jogo - Editar">
+			<h:form id="frmJogoEditar">
+				<h:panelGrid id="pnlJogoEditar" columns="2">
+				
+					<p:outputLabel value="Nome do Jogo: " />
+					<p:inputText value="#{MBGame.jogo.jogoNome}" required="true" />
+					
+					<p:outputLabel value="Jogo Data de Lançamento: " />
+					<p:inputText value="#{MBGame.jogo.jogoDataLancamento}" required="true" />
+					
+					<p:outputLabel value="Jogo Gênero: " />
+					<p:inputText value="#{MBGame.jogo.jogoGenero}" required="true" />
+					
+					<p:outputLabel value="Empresa: " />
+							<p:selectOneMenu value="#{MBGame.jogo.empresa.empresaID}">
+								<f:selectItem itemLabel="Selecione" />
+								<f:selectItems value="#{MBempresa.allEmpresas}" />
+							</p:selectOneMenu>
+
+				</h:panelGrid>
+
+				<h:panelGrid columns="2">
+					<p:commandButton value="Gravar" actionListener="#{MBGame.editar}"
+						oncomplete="PF('dlgJogoEditar').hide();"
+						update=":frmJogoListagem:tblJogos :msgGlobal" />
+					<p:commandButton value="Cancelar"
+						onclick="PF('dlgJogoEditar').hide();" />
+				</h:panelGrid>
+			</h:form>
+		</p:dialog>
+
+
+		<p:dialog widgetVar="dlgJogoExcluir" closable="true"
+			draggable="false" resizable="false" header="Jogo - Excluir">
+			<h:form id="frmJogoExcluir">
+				<h:panelGrid id="pnlJogoExcluir" columns="2">
+				
+							<p:outputLabel value="Jogo ID: " />
+				  			<p:inputText value="#{MBGame.jogo.jogoID}" size="60"/>
+							
+							<p:outputLabel value="Nome: " />
+				  			<p:inputText value="#{MBGame.jogo.jogoNome}" size="60"/>
+				  			
+				  			<p:outputLabel value="Data de Lançamento: "/>
+				  			<p:inputText value="#{MBGame.jogo.jogoDataLancamento}" size="60"/>
+				  			
+				  			<p:outputLabel value="Gênero do Jogo: " />
+				  			<p:inputText value="#{MBGame.jogo.jogoGenero}" size="60"/>
+				  			
+				  			<p:outputLabel value="Empresa ID: " />
+				  			<p:inputText value="#{MBGame.jogo.empresa.empresaID}" size="60"/>			  			
+
+				</h:panelGrid>
+
+				<h:panelGrid columns="2">
+					<p:commandButton value="Excluir"
+						actionListener="#{MBGame.excluir}"
+						update=":msgGlobal :frmJogoListagem:tblJogos"
+						oncomplete="PF('dlgJogoExcluir').hide();" />
+					<p:commandButton value="Cancelar"
+						oncomplete="PF('dlgJogoExcluir').hide();" />
+				</h:panelGrid>
+			</h:form>
+		</p:dialog>
+	</ui:define>
+	
+</ui:composition>

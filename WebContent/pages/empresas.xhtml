@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	template="/templates/modelo.xhtml">
+	
+	<ui:define name="menu">
+		<ui:include src="/includes/menu.xhtml" />
+	</ui:define>
+	
+	<ui:define name="conteudo">		
+		<h:form id="frmEmpresaListagem">
+			<p:dataTable id="tblEmpresas"
+						 emptyMessage="Nenhum registro encontrado."
+						 value="#{MBempresa.itens}" 
+						 var="itemEmpresa"
+						 paginator="true" 
+						 rows="10">
+			
+			<f:facet name="header">
+				Empresas - Listagem				
+			</f:facet>
+			
+			<p:column headerText="ID da Empresa: " sortBy="#{itemEmpresa.empresaID}">
+				<h:outputText value="#{itemEmpresa.empresaID}"/>
+			</p:column>
+			
+			<p:column headerText="Nome da Empresa: " sortBy="#{itemEmpresa.empresaNome}" >
+				<h:outputText value="#{itemEmpresa.empresaNome}"/>
+			</p:column>
+			
+			<p:column headerText="Data de criação da Empresa: " sortBy="#{itemEmpresa.empresaDataCriacao}">
+				<h:outputText value="#{itemEmpresa.empresaDataCriacao}"/>
+			</p:column>
+			
+			<p:column headerText="Breve História da Empresa: " sortBy="#{itemEmpresa.empresaHistoria}">
+				<h:outputText value="#{itemEmpresa.empresaHistoria}"/>
+			</p:column>
+			
+			<p:column headerText="Opções">
+					<p:commandButton value="Excluir" icon="ui-icon-trash"
+						oncomplete="PF('dlgEmpresaExcluir').show();"
+						update=":frmEmpresaExcluir:pnlEmpresaExcluir" immediate="true"
+						action="#{MBempresa.setEmpresa(itemEmpresa)}" />
+						&nbsp;&nbsp;	
+					<p:commandButton value="Editar" icon="ui-icon-pencil"
+						oncomplete="PF('dlgEmpresaEditar').show();"
+						update=":frmEmpresaEditar:pnlEmpresaEditar" immediate="true"
+						action="#{MBempresa.setEmpresa(itemEmpresa)}" />
+				</p:column>
+			
+			<f:facet name="footer">
+				<p:commandButton value="Novo"
+								 actionListener="#{MBempresa.prepararNovo}"
+								 oncomplete="PF('dlgEmpresaNovo').show();"
+								 update=":frmEmpresaNovo:pnlEmpresaNovo" />				
+			</f:facet>
+			
+			</p:dataTable>
+		</h:form>
+		
+		<p:dialog widgetVar="dlgEmpresaNovo" closable="false"
+				  draggable="false" resizable="false"
+				  modal="true" appendTo="@(body)" 
+				  header="Empresa - Nova" >
+				  <h:form id="frmEmpresaNovo">
+				  		<h:panelGrid id="pnlEmpresaNovo" columns="2">
+				  			<p:outputLabel value="Nome: " />
+				  			<p:inputText value="#{MBempresa.empresa.empresaNome}" size="60"/>
+				  			
+				  			<p:outputLabel value="Data de Criação da Empresa: "/>
+				  			<p:inputText value="#{MBempresa.empresa.empresaDataCriacao}" size="60"/>
+				  			
+				  			<p:outputLabel value="Breve História da Empresa " />
+				  			<p:inputText value="#{MBempresa.empresa.empresaHistoria}" size="60"/>				  			
+				  		</h:panelGrid>
+				  		
+				  		<h:panelGrid columns="2">
+				  			<p:commandButton value="Salvar" 
+				  							 actionListener="#{MBempresa.novo}"
+				  							 oncomplete="PF('dlgEmpresaNovo').hide();" 
+				  							 update=":frmEmpresaListagem:tblEmpresas :msgGlobal"/>
+				  			<p:commandButton value="Cancelar" onclick="PF('dlgEmpresaNovo').hide();" />
+				  		</h:panelGrid>
+				  </h:form>
+		</p:dialog>
+		<p:dialog widgetVar="dlgEmpresaEditar" closable="false"
+			draggable="false" resizable="false" modal="true" appendTo="@(body)"
+			header="Empresa - Editar">
+			<h:form id="frmEmpresaEditar">
+				<h:panelGrid id="pnlEmpresaEditar" columns="2">
+				
+					<p:outputLabel value="Nome do Empresa: " />
+					<p:inputText value="#{MBempresa.empresa.empresaNome}" required="true" />
+					
+					<p:outputLabel value="Breve História: " />
+					<p:inputText value="#{MBempresa.empresa.empresaHistoria}" required="true" />
+					
+					<p:outputLabel value="Empresa Data de Criação: " />
+					<p:inputText value="#{MBempresa.empresa.empresaDataCriacao}" required="true" />
+
+				</h:panelGrid>
+
+				<h:panelGrid columns="2">
+					<p:commandButton value="Gravar" actionListener="#{MBempresa.editar}"
+						oncomplete="PF('dlgEmpresaEditar').hide();"
+						update=":msgGlobal :frmEmpresaListagem:tblEmpresas" />
+						
+					<p:commandButton value="Cancelar"
+						onclick="PF('dlgEmpresaEditar').hide();" />
+				</h:panelGrid>
+			</h:form>
+		</p:dialog>
+
+
+		<p:dialog widgetVar="dlgEmpresaExcluir" closable="true"
+			draggable="false" resizable="false" header="Empresa - Excluir">
+			<h:form id="frmEmpresaExcluir">
+				<h:panelGrid id="pnlEmpresaExcluir" columns="2">
+				
+							<p:outputLabel value="Empresa ID: " />
+				  			<p:inputText value="#{MBempresa.empresa.empresaID}" size="60"/>
+							
+							<p:outputLabel value="Nome: " />
+				  			<p:inputText value="#{MBempresa.empresa.empresaNome}" size="60"/>
+				  			
+				  			<p:outputLabel value="Empresa História: "/>
+				  			<p:inputText value="#{MBempresa.empresa.empresaHistoria}" size="60"/>
+				  			
+				  			<p:outputLabel value="Empresa Data de Criação: " />
+				  			<p:inputText value="#{MBempresa.empresa.empresaDataCriacao}" size="60"/>
+				  					  			
+
+				</h:panelGrid>
+
+				<h:panelGrid columns="2">
+					<p:commandButton value="Excluir"
+						actionListener="#{MBempresa.excluir}"
+						update=":msgGlobal :frmEmpresaListagem:tblEmpresas"
+						oncomplete="PF('dlgEmpresaExcluir').hide();" />
+					<p:commandButton value="Cancelar"
+						oncomplete="PF('dlgEmpresaExcluir').hide();" />
+				</h:panelGrid>
+			</h:form>
+		</p:dialog>
+	</ui:define>
+	
+</ui:composition>
